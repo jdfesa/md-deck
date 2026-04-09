@@ -9,7 +9,9 @@ No usamos librerías complejas como React o motores de plantillas pesados. Todo 
 La entrada de `md-deck` es el archivo `.md`.
 El parser primero utiliza `gray-matter` para separar los metadatos YAML del contenido real en Markdown.
 
-Luego, se realiza el **split** (división) por diapositiva buscando literalmente la cadena `\n---\n`. El parser es lo suficientemente inteligente para identificar bloqueos de código, y si encuentra un `---` dentro de un bloque de código, lo ignora y no corta la diapositiva.
+Luego, el sistema verifica si el archivo utiliza el marcador explícito `\n---\n`.
+- **Split Manual**: Si existen `---`, se realiza una división literal respetando tus cortes, identificando y omitiendo los marcadores que se encuentren textualmente dentro de bloqueos de código.
+- **Auto-Paginación (In-Memory)**: Si el motor detecta que no existen literales `---`, se activa un algoritmo preventivo de curación que recorre todo el contenido para aislar el árbol e inyectar rupturas de slide virtuales antes de los encabezados `##` y `###`, garantizando que cualquier Markdown canónico estándar pueda proyectarse de inmediato sin modificaciones de formato.
 
 ### Clasificador de Slides (AST)
 El parser evalúa cada bloque de texto y lo clasifica según su título para entender qué debe renderizar:

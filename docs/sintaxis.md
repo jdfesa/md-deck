@@ -4,8 +4,8 @@ Esta guía detalla toda la sintaxis especial provista nativamente por al renderi
 
 ## 1. Reglas Generales
 
-- Toda separación de diapositiva se hace mediante `---` aislado entre líneas vacías.
-- Las imágenes deben estar en una subcarpeta a nivel de tu archivo llamada `img/` o `diagramas/`. Al empaquetar, `md-deck` detectará y copiará esa carpeta.
+- **Separación de diapositivas**: Se puede hacer de forma completamente manual aislando el marcador `---` entre líneas vacías. Sin embargo, si `md-deck` procesa el documento y no encuentra ni una sola vez este símbolo, disparará de forma silenciosa un **Auto-Paginador inteligente** seccionando el documento nativamente empleando los subtítulos (`##` y `###`) a modo de quiebre algorítmico y manteniendo así compatibilidad nativa con documentos genéricos.
+- Las imágenes deben estar en una subcarpeta a nivel de tu archivo llamada `img/` o `diagramas/`. Al empaquetar, `md-deck` detectará y copiará esa carpeta hacia el Output.
 
 ---
 

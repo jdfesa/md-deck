@@ -27,7 +27,15 @@ Este documento mantiene el estado actual del proyecto, indicando las fases compl
 - [x] Verificación visual de los componentes (Tarjetas, Callouts, Layouts).
 - [x] Slide de ejemplo funcional con todas las features (`example.md`).
 
-## 🟡 Fase 5: Despliegue y Distribución (Pendiente / En Progreso)
+## 🟢 Fase 5: Experiencia de Usuario & Orquestador (Completado)
+- [x] Menú interactivo CLI persistente (while-loop) con CLI toolkit.
+- [x] Generador de Plantilla `presentacion-demo.md` (Showcase de componentes interactivo).
+- [x] Auto-Paginador Inteligente (Transformación in-memory de Markdown vanilla).
+- [x] Expansión a 5 Temas CSS visuales de paletas curadas y alto nivel.
+- [x] Componentes UX inyectados globalmente (Scroll Indicators 15s-animations).
+- [x] Bloque de código emulando GUI "macOS Editor Window".
+
+## 🟡 Fase 6: Despliegue y Distribución (Pendiente / En Progreso)
 - [ ] Analizar flujos de despliegue a una línea: `md-deck deploy`.
   - *Posible integración con Netlify CLI, Surge, o Vercel CLI.*
 - [ ] Refactorización si es necesaria para compatibilidad de sub-rutas en páginas estáticas.
