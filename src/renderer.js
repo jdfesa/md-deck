@@ -213,8 +213,16 @@ function processMarkdown(md) {
     breaks: false,
   });
 
-  // Post-process: indent for template
-  return html.split('\n').map(line => '        ' + line).join('\n');
+  // Post-process: indent for template (skip inside <pre> to preserve code formatting)
+  const lines = html.split('\n');
+  const result = [];
+  let insidePre = false;
+  for (const line of lines) {
+    if (/<pre[^>]*>/i.test(line)) insidePre = true;
+    result.push(insidePre ? line : '        ' + line);
+    if (/<\/pre>/i.test(line)) insidePre = false;
+  }
+  return result.join('\n');
 }
 
 /**

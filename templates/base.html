@@ -29,9 +29,8 @@
 /* Scroll Indicator */
 .scroll-indicator {
   position: absolute;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 80px;
+  right: 40px;
   color: var(--accent-primary, rgba(200,200,216,0.8));
   width: 40px;
   height: 40px;
@@ -49,15 +48,48 @@
   stroke-width: 3;
 }
 @keyframes flash-scroll {
-  0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
-  20% { opacity: 1; transform: translateX(-50%) translateY(0); }
-  80% { opacity: 1; transform: translateX(-50%) translateY(0); }
-  100% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  0% { opacity: 0; transform: translateY(-10px); }
+  15% { opacity: 1; transform: translateY(0); }
+  85% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(8px); }
 }
 .scroll-indicator.active {
-  animation: flash-scroll 2s ease-in-out 3;
+  animation: flash-scroll 2.5s ease-in-out 6 forwards;
 }
 {{theme_css}}
+
+/* Editor Style for Code Blocks */
+.reveal pre {
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5) !important;
+  border-radius: 12px !important;
+  background: var(--surface-1, #1e1e1e) !important;
+  border: 1px solid var(--border-subtle) !important;
+  position: relative !important;
+  margin-top: 24px !important;
+  padding-top: 40px !important;
+}
+.reveal pre::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 18px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff5f56;
+  box-shadow: 20px 0 0 #ffbd2e, 40px 0 0 #27c93f;
+  z-index: 10;
+}
+.reveal pre code {
+  padding: 8px 24px 24px !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 0 12px 12px !important;
+  display: block !important;
+  overflow-x: auto !important;
+  text-align: left !important;
+  white-space: pre !important;
+}
   </style>
 </head>
 <body>
