@@ -136,7 +136,7 @@ function renderSectionSlide(slide) {
   const num = String(slide.sectionNumber).padStart(2, '0');
 
   const descHtml = desc
-    ? `<p class="section-desc">${escapeHtml(desc)}</p>`
+    ? `<p class="section-desc">${marked.parseInline(desc)}</p>`
     : '';
 
   return `      <section class="section-title" data-auto-animate>
