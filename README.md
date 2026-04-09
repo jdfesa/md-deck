@@ -162,15 +162,27 @@ Contenido de la columna derecha...
 :::end
 ```
 
-### Imágenes
+### Imágenes y Estructura de Carpetas
 
-Las imágenes se renderizan dentro de un contenedor con borde gradiente:
+Las imágenes se renderizan automáticamente dentro de un contenedor estilizado. Asegurate de mantener tus recursos junto al archivo `.md` siguiendo esta estructura común:
+
+```text
+mi-proyecto/
+├── presentacion.md     ← Tu archivo principal
+├── img/                ← Colocá tus imágenes acá
+│   ├── foto.jpg
+│   └── diagrama.png
+└── diagramas/          ← Tambien podés usar este nombre de carpeta
+    └── modelo.svg
+```
+
+Para referenciarlas en Markdown:
 
 ```markdown
 ![Diagrama UML](img/diagrama.png)
 ```
 
-Colocá tus imágenes en una carpeta `img/` junto al `.md`. Se copian automáticamente al output.
+> **Nota:** Al ejecutar `md-deck build`, las carpetas `img/` o `diagramas/` (si existen) se copian de forma automática a la carpeta de tu presentación final.
 
 ### Tablas
 
@@ -313,53 +325,7 @@ md-deck/
 
 El proyecto está en constante evolución. Consulta el archivo [TODO.md](TODO.md) en la raíz del repositorio para ver en qué fase del desarrollo nos encontramos y qué funcionalidades están planeadas para el futuro (como despliegues automatizados a Netlify/Surge).
 
----
 
-## 🔍 Análisis: Puntos de Mejora Identificados
-
-A continuación se detallan áreas donde el README podría mejorarse para mayor claridad y utilidad:
-
-### 1. **Diagrama de Flujo Completo Faltante**
-Actualmente no hay un ejemplo paso a paso que muestre: `archivo.md` → generar → visualizar en navegador. Podría ayudar mostrar un "Antes y Después" visual.
-
-### 2. **Documentación Incompleta de Estructura de Carpetas**
-Se menciona que imágenes van en `img/` y diagramas en `diagramas/`, pero no está explícito dónde exactamente deben colocarse estos directorios en relación al archivo `.md`.
-
-**Ejemplo que falta:**
-```
-mi-presentacion/
-├── presentacion.md
-├── img/
-│   ├── diagrama1.png
-│   └── foto.jpg
-└── diagramas/
-    └── arquitectura.svg
-```
-
-### 3. **Diferenciación de Comandos No es Clara**
-Aunque `build` y `serve` están documentados, no queda explícito **cuándo usar cada uno**:
-- `build`: para generar una presentación final lista para compartir/desplegar
-- `serve`: para desarrollo local con preview en vivo mientras editás
-
-### 4. **Callouts en el README son Muy Básicos**
-La sección de formato muestra `[!note]`, `[!tip]`, etc., pero el ejemplo es simplista. En `docs/sintaxis.md` hay más detalles pero es fácil pasar por alto la documentación externa.
-
-### 5. **Falta Información sobre Output**
-Un usuario novel no sabe bien qué esperar después de ejecutar `md-deck build`. ¿Dónde va el archivo? ¿Está listo para compartir? ¿Ocupa mucho espacio? Se agregó más abajo en la descripción de comandos, pero podría anticiparse.
-
-### 6. **Ejemplos de Uso Están Dispersos**
-Hay ejemplos en Quick Start, en la sección de comandos, en formato de Markdown, etc. Consolidar un ejemplo **end-to-end real** sería de ayuda.
-
-### 7. **Sistema de Temas Poco Documentado**
-Se menciona `--theme <name>` pero no queda claro: ¿cuáles son los temas disponibles? ¿Cómo crear uno personalizado? Actualmente solo existe `default`.
-
-### 8. **Falta Troubleshooting / FAQ**
-No hay sección que responda dudas comunes como:
-- "¿Por qué se ve extraño mi presentación?"
-- "¿Puedo cambiar colores sin editar CSS?"
-- "¿Funciona offline?"
-
----
 
 ## 📄 Licencia
 

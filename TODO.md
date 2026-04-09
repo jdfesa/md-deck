@@ -37,3 +37,6 @@ Este documento mantiene el estado actual del proyecto, indicando las fases compl
 - [ ] Soporte para plantillas customizables o más temas predefinidos (Light Mode / Material Theme).
 - [ ] PDF Export incorporado (Print to PDF via Puppeteer / Playwright).
 - [ ] Extensión de VS Code u Obsidian vinculada directamente al CLI.
+- [ ] Mejorar la documentación: Agregar una sección de Troubleshooting / FAQ en el `README.md`.
+- [ ] Mejorar la documentación: Crear un GIF/Flujo de "Antes y Después" visual en el README para hacer más obvio el end-to-end.
+- [ ] Mejorar la documentación: Documentar el sistema `--theme` y los pasos para customización o creación de nuevos estilos.
