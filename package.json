@@ -1,0 +1,26 @@
+{
+  "name": "md-deck",
+  "version": "1.0.0",
+  "description": "Markdown to polished Reveal.js presentation generator",
+  "type": "module",
+  "bin": {
+    "md-deck": "./bin/md-deck.js"
+  },
+  "scripts": {
+    "dev": "node bin/md-deck.js serve example.md",
+    "build": "node bin/md-deck.js build example.md"
+  },
+  "keywords": [
+    "markdown",
+    "presentation",
+    "revealjs",
+    "slides"
+  ],
+  "author": "jd",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^14.0.3",
+    "gray-matter": "^4.0.3",
+    "marked": "^18.0.0"
+  }
+}
