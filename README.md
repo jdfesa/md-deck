@@ -219,7 +219,9 @@ md-deck/
 │   └── server.js         # Servidor local
 ├── templates/base.html   # Skeleton HTML (Reveal.js)
 ├── themes/default.css    # Tema dark premium
-├── example.md            # Ejemplo de referencia
+├── examples/             # Presentaciones de ejemplo
+│   ├── guia-rapida.md    # Template básico
+│   └── relaciones-uml.md # Caso de uso real
 └── output/               # Presentaciones generadas
 ```
 
