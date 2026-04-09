@@ -18,6 +18,7 @@ export async function startInteractiveMenu(buildPresentation, startServer) {
   const lightOrange = chalk.hex('#FFB37C');
   const white = chalk.white;
 
+  // Banner — solo se muestra una vez
   console.log('');
   console.log(orange('  ╭───────────────────────╮'));
   console.log(orange('  │ ') + white('◇ Info: md-deck     ') + orange('  │'));
@@ -34,25 +35,105 @@ export async function startInteractiveMenu(buildPresentation, startServer) {
   console.log(white('  > md-deck (open source)'));
   console.log('');
 
-  const action = await select({
-    message: '¿Qué deseas hacer?',
-    choices: [
-      { name: '✨ Generar plantilla de presentación', value: 'template' },
-      { name: '🛠️  Construir presentación', value: 'build' },
-      { name: '🌐 Iniciar servidor (Live Preview)', value: 'serve' },
-      { name: '❌ Salir', value: 'exit' }
-    ]
+  // Loop principal — vuelve al menú después de cada acción
+  while (true) {
+    const action = await select({
+      message: '¿Qué deseas hacer?',
+      choices: [
+        { name: '✨ Generar plantilla de presentación', value: 'template' },
+        { name: '🛠️  Construir presentación', value: 'build' },
+        { name: '🌐 Iniciar servidor (Live Preview)', value: 'serve' },
+        { name: '❌ Salir', value: 'exit' }
+      ]
+    });
+
+    if (action === 'exit') {
+      console.log(chalk.gray('  ¡Hasta luego!\n'));
+      process.exit(0);
+    }
+
+    if (action === 'template') {
+      await handleTemplate();
+      continue;
+    }
+
+    // Para build y serve, necesitamos archivo y tema
+    const fileToActOn = await selectFile();
+    if (!fileToActOn) continue;
+
+    const theme = await selectTheme();
+
+    try {
+      if (action === 'build') {
+        const result = buildPresentation(fileToActOn, { theme, output: null });
+        console.log('');
+        console.log(chalk.green('  ✅ ¡Presentación construida exitosamente!'));
+        console.log(chalk.blue(`  📂 ${result.outputDir}`));
+        console.log(chalk.blue(`  📄 ${result.outputFile}`));
+        console.log('');
+      } else if (action === 'serve') {
+        const portInput = await input({ message: 'Puerto:', default: '8080' });
+        const portNum = parseInt(portInput, 10);
+
+        const result = buildPresentation(fileToActOn, { theme, output: null, noUuid: true });
+        const server = await startServer(result.outputDir, portNum);
+        const actualPort = server.address().port;
+
+        console.log('');
+        console.log(chalk.cyan('  📽️  md-deck — Live Preview'));
+        console.log(chalk.gray('  ─────────────────────────'));
+        console.log(`  🌐 http://localhost:${actualPort}`);
+        console.log(`  📂 ${result.outputDir}`);
+        console.log(chalk.gray('  ⌨️  Presiona Ctrl+C para detener'));
+        console.log('');
+        return; // Serve bloquea — no volver al menú
+      }
+    } catch (err) {
+      console.error(chalk.red(`\n  ❌ Error: ${err.message}\n`));
+    }
+  }
+}
+
+// ── Helpers ──
+
+async function selectFile() {
+  const mdFiles = getMarkdownFiles();
+
+  if (mdFiles.length === 0) {
+    console.log(chalk.yellow('  ⚠️  No se encontraron archivos .md en esta carpeta.'));
+    return await input({ message: 'Ingresa la ruta de tu archivo .md:' });
+  }
+
+  const chosen = await select({
+    message: 'Selecciona el archivo Markdown de origen:',
+    choices: mdFiles.map(file => ({ name: `📄 ${file}`, value: file })).concat([
+      { name: '✏️  Escribir ruta manualmente...', value: 'manual' },
+      { name: '↩️  Volver al menú', value: 'back' }
+    ])
   });
 
-  if (action === 'exit') {
-    console.log(chalk.gray('  ¡Hasta luego!\n'));
-    process.exit(0);
-  }
-  
-  if (action === 'template') {
-    const filename = await input({ message: 'Nombre del archivo:', default: 'presentacion-demo.md' });
-    const today = new Date().toISOString().split('T')[0];
-    const content = `---
+  if (chosen === 'back') return null;
+  if (chosen === 'manual') return await input({ message: 'Ingresa la ruta de tu archivo .md:' });
+  return chosen;
+}
+
+async function selectTheme() {
+  return await select({
+    message: 'Selecciona el tema de la presentación:',
+    choices: [
+      { name: '🎨 Default (Dark Premium)', value: 'default' },
+      { name: '🌑 Dark', value: 'dark' },
+      { name: '🌙 Night', value: 'night' },
+      { name: '🌕 Moon', value: 'moon' },
+      { name: '☀️  Solarized', value: 'solarized' }
+    ]
+  });
+}
+
+async function handleTemplate() {
+  const filename = await input({ message: 'Nombre del archivo:', default: 'presentacion-demo.md' });
+  const today = new Date().toISOString().split('T')[0];
+  const content = `---
 title: Plantilla Demostrativa
 subtitle: Guía visual de componentes md-deck
 author: Tu Nombre
@@ -249,71 +330,8 @@ class Singleton:
 # ¡Gracias!
 Presentación generada con md-deck
 `;
-    writeFileSync(filename, content);
-    console.log('');
-    console.log(chalk.green(`  ✅ Plantilla generada: ${filename}`));
-    console.log(chalk.gray(`  Abrila en tu editor, personalizala, y ejecutá 'md-deck' para servirla.\n`));
-    process.exit(0);
-  }
-
-  // File selection
-  const mdFiles = getMarkdownFiles();
-  let fileToActOn = '';
-
-  if (mdFiles.length === 0) {
-    console.log(chalk.yellow('  ⚠️  No se encontraron archivos .md en esta carpeta.'));
-    fileToActOn = await input({ message: 'Ingresa la ruta de tu archivo .md:' });
-  } else {
-    fileToActOn = await select({
-      message: 'Selecciona el archivo Markdown de origen:',
-      choices: mdFiles.map(file => ({ name: `📄 ${file}`, value: file })).concat([
-        { name: 'Escribir ruta manualmente...', value: 'manual' }
-      ])
-    });
-
-    if (fileToActOn === 'manual') {
-      fileToActOn = await input({ message: 'Ingresa la ruta de tu archivo .md:' });
-    }
-  }
-
-  // Theme selection
-  const theme = await select({
-    message: 'Selecciona el tema de la presentación:',
-    choices: [
-      { name: 'Default', value: 'default' },
-      { name: 'Dark', value: 'dark' },
-      { name: 'Night', value: 'night' },
-      { name: 'Moon', value: 'moon' },
-      { name: 'Solarized', value: 'solarized' }
-    ]
-  });
-
-  try {
-    if (action === 'build') {
-      const result = buildPresentation(fileToActOn, { theme, output: null });
-      console.log('');
-      console.log(chalk.green('  ✅ ¡Presentación construida exitosamente!'));
-      console.log(chalk.blue(`  📂 ${result.outputDir}`));
-      console.log(chalk.blue(`  📄 ${result.outputFile}`));
-      console.log('');
-    } else if (action === 'serve') {
-      const portInput = await input({ message: 'Puerto:', default: '8080' });
-      const portNum = parseInt(portInput, 10);
-      
-      const result = buildPresentation(fileToActOn, { theme, output: null, noUuid: true });
-      const server = await startServer(result.outputDir, portNum);
-      const actualPort = server.address().port;
-
-      console.log('');
-      console.log(chalk.cyan('  📽️  md-deck — Live Preview'));
-      console.log(chalk.gray('  ─────────────────────────'));
-      console.log(`  🌐 http://localhost:${actualPort}`);
-      console.log(`  📂 ${result.outputDir}`);
-      console.log(chalk.gray('  ⌨️  Presiona Ctrl+C para detener'));
-      console.log('');
-    }
-  } catch (err) {
-    console.error(chalk.red(`\n  ❌ Error: ${err.message}\n`));
-    process.exit(1);
-  }
+  writeFileSync(filename, content);
+  console.log('');
+  console.log(chalk.green(`  ✅ Plantilla generada: ${filename}`));
+  console.log(chalk.gray(`  Abrila en tu editor, personalizala, y ejecutá 'md-deck' para servirla.\n`));
 }
