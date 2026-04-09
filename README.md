@@ -189,17 +189,14 @@ Para referenciarlas en Markdown:
 
 Las tablas Markdown se renderizan con estilo premium:
 
-```markdown
 | Columna 1 | Columna 2 | Columna 3 |
 |---|---|---|
 | Dato | Dato | Dato |
-```
 
 ### Código
 
 Los bloques de código se renderizan con syntax highlighting (Highlight.js/Monokai):
 
-````markdown
 ```java
 public class Main {
     public static void main(String[] args) {
@@ -207,7 +204,6 @@ public class Main {
     }
 }
 ```
-````
 
 ---
 

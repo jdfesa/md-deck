@@ -300,10 +300,43 @@ function preprocessImages(md) {
  *   :::end
  */
 function preprocessColumns(md) {
-  return md
-    .replace(/^:::columns\s*$/gm, '<div class="two-cols"><div>')
-    .replace(/^:::split\s*$/gm, '</div><div>')
-    .replace(/^:::end\s*$/gm, '</div></div>');
+  const lines = md.split('\n');
+  const result = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    if (/^:::columns\s*$/i.test(lines[i])) {
+      // Collect all column content until :::end
+      const columns = [];
+      let currentCol = [];
+      i++;
+
+      while (i < lines.length && !/^:::end\s*$/i.test(lines[i])) {
+        if (/^:::split\s*$/i.test(lines[i])) {
+          columns.push(currentCol.join('\n'));
+          currentCol = [];
+        } else {
+          currentCol.push(lines[i]);
+        }
+        i++;
+      }
+      columns.push(currentCol.join('\n'));
+      i++; // skip :::end
+
+      // Parse each column through marked independently
+      const colsHtml = columns.map(colMd => {
+        const parsed = marked.parse(colMd.trim(), { gfm: true, breaks: false });
+        return `<div>${parsed}</div>`;
+      }).join('\n');
+
+      result.push(`<div class="two-cols">${colsHtml}</div>`);
+    } else {
+      result.push(lines[i]);
+      i++;
+    }
+  }
+
+  return result.join('\n');
 }
 
 /**
