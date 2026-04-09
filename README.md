@@ -22,7 +22,7 @@ Tu única preocupación debe ser enseñar, explicar o exponer el contenido; `md-
 
 - [Node.js](https://nodejs.org/) v18 o superior.
 
-### Paso 1: Clonar e instalar dependencias (local al proyecto)
+### Paso 1: Clonar e instalar dependencias
 
 ```bash
 git clone https://github.com/jdfesa/md-deck.git
@@ -30,7 +30,7 @@ cd md-deck
 npm install
 ```
 
-> Las dependencias (`commander`, `marked`, `gray-matter`) se instalan **dentro del proyecto** en la carpeta `node_modules/`. No se contamina el sistema global.
+> Las dependencias (`commander`, `marked`, `gray-matter`, `chalk`, `@inquirer/prompts`) se instalan **dentro del proyecto** en la carpeta `node_modules/`. No se contamina el sistema global.
 
 ### Paso 2 (Opcional): Registrar el comando global
 
@@ -40,38 +40,49 @@ Si querés usar `md-deck` como comando desde cualquier carpeta de tu sistema:
 npm link
 ```
 
-Esto crea un symlink (acceso directo) global que apunta al binario del proyecto. **No duplica las dependencias**, solo las referencia.
-
-Si preferís no instalar nada de forma global, siempre podés ejecutar directamente:
-
-```bash
-node bin/md-deck.js build mi-presentacion.md
-```
+Esto crea un symlink global que apunta al binario del proyecto. **No duplica las dependencias**, solo las referencia.
 
 ---
 
 ## 🚀 Quick Start
 
-```bash
-# Opción A: Si hiciste npm link (comando global)
-md-deck build mi-presentacion.md
-md-deck serve mi-presentacion.md --open
+### Modo Interactivo (Recomendado)
 
-# Opción B: Sin instalar nada global (desde la raíz del proyecto)
-node bin/md-deck.js build mi-presentacion.md
-node bin/md-deck.js serve mi-presentacion.md --open
+Ejecutá `md-deck` sin argumentos para abrir el **menú interactivo** con asistente guiado:
+
+```bash
+md-deck
 ```
 
-## 📚 Documentación Detallada
+El menú te permite:
+- ✨ **Generar una plantilla** de presentación con la estructura correcta.
+- 🛠️ **Construir** una presentación eligiendo archivo y tema visualmente.
+- 🌐 **Iniciar un servidor local** con preview en vivo.
 
-Para usuarios avanzados y desarrolladores que deseen entender el funcionamiento interno de `md-deck` o la lista exhaustiva de componentes, pueden consultar la carpeta de `docs/`:
+### Modo Directo (CLI)
 
-- [Arquitectura Interna](docs/arquitectura.md): Cómo funciona el parseo y renderizado.
-- [Sintaxis y Componentes](docs/sintaxis.md): Lista completa de todo lo que puedes hacer con Markdown en `md-deck`.
+```bash
+md-deck build mi-presentacion.md
+md-deck serve mi-presentacion.md --open
+```
+
+> Si no hiciste `npm link`, usá `node bin/md-deck.js` en vez de `md-deck`.
 
 ---
 
-## 📝 Formato del Markdown (Resumen)
+## 🧠 Auto-Paginador Inteligente
+
+`md-deck` puede convertir **cualquier archivo Markdown** en una presentación, incluso si no tiene separadores `---`.
+
+**¿Cómo funciona?** Si el motor detecta que tu archivo no contiene `---`, activa el **modo Auto-Cura**: recorre el contenido y genera una nueva diapositiva automáticamente antes de cada título `##` o `###`. Todo se procesa en memoria sin modificar tu archivo original.
+
+Esto significa que podés tomar un `README.md`, un apunte de clase o un artículo y convertirlo en presentación al instante.
+
+> Si tu archivo **sí contiene** separadores `---`, el auto-paginador se desactiva y respeta tu estructura manual.
+
+---
+
+## 📝 Formato del Markdown
 
 ### Frontmatter (YAML)
 
@@ -83,14 +94,17 @@ date: "2026-04-08"
 institution: "Tu Institución"
 subject: "Materia"
 professor: "Nombre del Profesor"
+theme: moon
 lang: es
-expires: "2026-04-22"   # Opcional: fecha de expiración
+expires: "2026-04-22"
 ---
 ```
 
+> El campo `theme` en el frontmatter permite definir el tema directamente desde el archivo. Si se pasa `--theme` por CLI, este último toma prioridad.
+
 ### Separar Slides
 
-Usá `---` (tres guiones) para separar diapositivas:
+Usá `---` (tres guiones) para separar diapositivas manualmente:
 
 ```markdown
 # Título de la Presentación
@@ -162,30 +176,7 @@ Contenido de la columna derecha...
 :::end
 ```
 
-### Imágenes y Estructura de Carpetas
-
-Las imágenes se renderizan automáticamente dentro de un contenedor estilizado. Asegurate de mantener tus recursos junto al archivo `.md` siguiendo esta estructura común:
-
-```text
-mi-proyecto/
-├── presentacion.md     ← Tu archivo principal
-├── img/                ← Colocá tus imágenes acá
-│   ├── foto.jpg
-│   └── diagrama.png
-└── diagramas/          ← Tambien podés usar este nombre de carpeta
-    └── modelo.svg
-```
-
-Para referenciarlas en Markdown:
-
-```markdown
-![Diagrama UML](img/diagrama.png)
-```
-
-> **Nota:** Al ejecutar `md-deck build`, las carpetas `img/` o `diagramas/` (si existen) se copian de forma automática a la carpeta de tu presentación final.
-
 ### Tablas
-
 
 Las tablas Markdown se renderizan con estilo premium:
 
@@ -195,7 +186,7 @@ Las tablas Markdown se renderizan con estilo premium:
 
 ### Código
 
-Los bloques de código se renderizan con syntax highlighting (Highlight.js/Monokai):
+Los bloques de código se renderizan con syntax highlighting (Highlight.js/Monokai) dentro de una ventana estilo editor con los botones clásicos de macOS:
 
 ```java
 public class Main {
@@ -205,6 +196,20 @@ public class Main {
 }
 ```
 
+### Imágenes
+
+Las imágenes se renderizan automáticamente dentro de un contenedor estilizado. Mantené tus recursos junto al archivo `.md`:
+
+```text
+mi-proyecto/
+├── presentacion.md
+├── img/
+│   ├── foto.jpg
+│   └── diagrama.png
+```
+
+> Al ejecutar `md-deck build`, las carpetas `img/` o `diagramas/` (si existen) se copian automáticamente a la carpeta de salida.
+
 ---
 
 ## ⚡ Comandos
@@ -213,13 +218,11 @@ public class Main {
 
 Lee el archivo Markdown, lo procesa y genera una carpeta dentro de `output/` con un **`index.html` autocontenido** listo para abrir directamente en cualquier navegador o subir a un hosting estático.
 
-**¿Qué se genera?**
-
 ```
 output/
-└── a1b2c3d4-mi-presentacion/    ← carpeta con prefijo UUID único
-    ├── index.html                ← la presentación completa
-    └── img/                      ← copia de las imágenes (si existían)
+└── a1b2c3d4-mi-presentacion/
+    ├── index.html
+    └── img/
 ```
 
 > El prefijo UUID evita colisiones si generás varias versiones. Podés desactivarlo con `--no-uuid` o especificar tu propia carpeta con `-o`.
@@ -232,23 +235,9 @@ output/
 | `--expires <date>` | Fecha de expiración (YYYY-MM-DD) | — |
 | `--no-uuid` | Sin prefijo UUID en la carpeta | `false` |
 
-**Ejemplo:**
-
-```bash
-md-deck build examples/guia-rapida.md
-# ✅ Presentation built successfully!
-# 📂 /Users/jd/Development/md-deck/output/f3a1b9c2-guia-rapida
-# 📄 /Users/jd/.../output/f3a1b9c2-guia-rapida/index.html
-
-# Después simplemente abrí el archivo:
-open output/f3a1b9c2-guia-rapida/index.html
-```
-
 ### `md-deck serve <archivo.md>`
 
-Genera la presentación y **levanta un servidor HTTP local** en tu máquina para previsualizarla en el navegador. Ideal mientras estás editando el `.md`.
-
-El servidor utiliza Node.js puro (`node:http`), sin dependencias externas adicionales. Se auto-asigna el puerto `8080` por defecto, y si ese puerto está ocupado, prueba el siguiente automáticamente.
+Genera la presentación y **levanta un servidor HTTP local** para previsualizarla en el navegador. Ideal mientras estás editando el `.md`.
 
 | Flag | Descripción | Default |
 |---|---|---|
@@ -256,32 +245,33 @@ El servidor utiliza Node.js puro (`node:http`), sin dependencias externas adicio
 | `--open` | Abrir el navegador automáticamente | `false` |
 | `-t, --theme <name>` | Tema CSS | `default` |
 
-**Ejemplo:**
-
-```bash
-md-deck serve examples/guia-rapida.md --open
-#
-#  📽️  md-deck — Live Preview
-#  ─────────────────────────
-#  🌐 http://localhost:8080       ← abrí esta URL en tu navegador
-#  📂 output/guia-rapida
-#  ⌨️  Press Ctrl+C to stop       ← para detener el servidor
-#
-```
-
 ---
 
-## 🎨 Sistema de Diseño
+## 🎨 Temas Disponibles
 
-El tema `default` incluye:
+`md-deck` incluye **5 temas** listos para usar:
 
-- **Dark mode premium** con acentos vibrantes
-- **Paleta de colores**: Púrpura `#7c6aef`, Verde `#06d6a0`, Amarillo `#ffd166`, Rosa `#ef476f`, Azul `#118ab2`
+| Tema | Descripción |
+|---|---|
+| `default` | Dark premium con acentos púrpura y verde |
+| `dark` | Tonos oscuros con acentos cyan y rosa |
+| `night` | Fondo profundo con acentos ámbar y turquesa |
+| `moon` | Azul-gris elegante con acentos lavanda |
+| `solarized` | Paleta Solarized Dark clásica |
+
+Se seleccionan con `--theme <nombre>`, desde el frontmatter (`theme: moon`), o desde el menú interactivo.
+
+### Sistema de Diseño
+
+Todos los temas comparten:
+
 - **Tipografía**: Inter (headings + body) + JetBrains Mono (código)
 - **Componentes**: Cards, badges, highlight boxes, diagram containers, tablas estilizadas
+- **Código**: Ventanas estilo editor con botones macOS y syntax highlighting
 - **Transiciones**: `data-auto-animate` automático entre slides
-- **Progress bar**: Gradiente púrpura → verde
+- **Progress bar**: Gradiente animado
 - **Numeración**: Slide counter en esquina inferior derecha
+- **Scroll inteligente**: En slides con contenido extenso, aparece un indicador visual animado señalando que se puede hacer scroll
 
 ---
 
@@ -289,16 +279,24 @@ El tema `default` incluye:
 
 ```
 md-deck/
-├── bin/md-deck.js        # CLI entry point
+├── bin/md-deck.js        # CLI entry point + orquestador
 ├── src/
-│   ├── parser.js         # Markdown → slide AST
+│   ├── interactive.js    # Menú interactivo + generador de plantillas
+│   ├── parser.js         # Markdown → slide AST (con auto-paginación)
 │   ├── renderer.js       # Slide AST → HTML
 │   └── server.js         # Servidor local
 ├── templates/base.html   # Skeleton HTML (Reveal.js)
-├── themes/default.css    # Tema dark premium
+├── themes/               # Temas CSS
+│   ├── default.css
+│   ├── dark.css
+│   ├── night.css
+│   ├── moon.css
+│   └── solarized.css
 ├── examples/             # Presentaciones de ejemplo
-│   ├── guia-rapida.md    # Template básico
-│   └── relaciones-uml.md # Caso de uso real
+│   └── guia-rapida.md
+├── docs/                 # Documentación técnica
+│   ├── arquitectura.md
+│   └── sintaxis.md
 └── output/               # Presentaciones generadas
 ```
 
@@ -317,11 +315,18 @@ md-deck/
 
 ---
 
-## 🗺️ Roadmap / TODO
+## 📚 Documentación Detallada
 
-El proyecto está en constante evolución. Consulta el archivo [TODO.md](TODO.md) en la raíz del repositorio para ver en qué fase del desarrollo nos encontramos y qué funcionalidades están planeadas para el futuro (como despliegues automatizados a Netlify/Surge).
+Para usuarios avanzados y desarrolladores que deseen entender el funcionamiento interno:
 
+- [Arquitectura Interna](docs/arquitectura.md): Cómo funciona el parseo y renderizado.
+- [Sintaxis y Componentes](docs/sintaxis.md): Lista completa de todo lo que puedes hacer con Markdown en `md-deck`.
 
+---
+
+## 🗺️ Roadmap
+
+El proyecto está en constante evolución. Consultá el archivo [TODO.md](TODO.md) para ver las funcionalidades planeadas.
 
 ## 📄 Licencia
 
