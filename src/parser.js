@@ -52,9 +52,12 @@ export function parse(raw) {
   // 1. Extract frontmatter
   const { data: meta, content } = matter(raw);
 
+  // 1.5 Auto-paginate if no separators are found
+  const processedContent = autoPaginate(content);
+
   // 2. Split content into raw slide blocks by `---`
   //    We need to be careful: `---` can appear in code blocks.
-  const slideBlocks = splitSlides(content);
+  const slideBlocks = splitSlides(processedContent);
 
   // 3. Classify each block as a slide type
   let sectionCounter = 0;
@@ -111,6 +114,48 @@ function splitSlides(content) {
   }
 
   return blocks;
+}
+
+/**
+ * Auto-paginate: If the document doesn't use `---` separators,
+ * intelligently inject them before `## ` (H2) headings.
+ * @param {string} content
+ * @returns {string}
+ */
+function autoPaginate(content) {
+  const blocks = splitSlides(content);
+  // If user already used separators (more than 1 block), respect their manual layout
+  if (blocks.length > 1) {
+    return content;
+  }
+
+  // Otherwise, auto-paginate by injecting `---` before `## ` headings
+  const lines = content.split('\n');
+  const result = [];
+  let inCodeBlock = false;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    
+    if (line.trimStart().startsWith('```')) {
+      inCodeBlock = !inCodeBlock;
+    }
+
+    // If outside code block and we hit a `## ` or `### `, inject separator
+    // Do not inject before the very first line of the file to avoid empty slides
+    if (!inCodeBlock && /^#{2,3}\s/.test(line)) {
+       const hasContentBefore = result.some(r => r.trim() !== '');
+       if (hasContentBefore) {
+         result.push('');
+         result.push('---');
+         result.push('');
+       }
+    }
+    
+    result.push(line);
+  }
+
+  return result.join('\n');
 }
 
 /**

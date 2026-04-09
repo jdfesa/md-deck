@@ -18,6 +18,45 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <style>
+/* Responsive Overflow Fix */
+.reveal .slides section {
+  max-height: 100%;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* Scroll Indicator */
+.scroll-indicator {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--accent-primary, rgba(200,200,216,0.8));
+  width: 40px;
+  height: 40px;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.scroll-indicator svg {
+  width: 32px;
+  height: 32px;
+  stroke-width: 3;
+}
+@keyframes flash-scroll {
+  0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  20% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+}
+.scroll-indicator.active {
+  animation: flash-scroll 2s ease-in-out 3;
+}
 {{theme_css}}
   </style>
 </head>
@@ -56,6 +95,31 @@
         }
       }
     });
+
+    // Setup Scroll Indicator
+    const scrollIndicator = document.createElement('div');
+    scrollIndicator.className = 'scroll-indicator';
+    scrollIndicator.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+    document.querySelector('.reveal').appendChild(scrollIndicator);
+
+    function checkScroll() {
+      const currentSlide = Reveal.getCurrentSlide();
+      if (!currentSlide) return;
+      
+      // Wait a tiny bit for render
+      setTimeout(() => {
+        if (currentSlide.scrollHeight > currentSlide.clientHeight + 10) {
+          scrollIndicator.classList.remove('active');
+          void scrollIndicator.offsetWidth; // trigger reflow
+          scrollIndicator.classList.add('active');
+        } else {
+          scrollIndicator.classList.remove('active');
+        }
+      }, 50);
+    }
+
+    Reveal.on('ready', checkScroll);
+    Reveal.on('slidechanged', checkScroll);
   </script>
 </body>
 </html>

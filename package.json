@@ -19,6 +19,8 @@
   "author": "jd",
   "license": "MIT",
   "dependencies": {
+    "@inquirer/prompts": "^8.4.1",
+    "chalk": "^5.6.2",
     "commander": "^14.0.3",
     "gray-matter": "^4.0.3",
     "marked": "^18.0.0"

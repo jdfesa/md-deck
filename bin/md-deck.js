@@ -85,7 +85,16 @@ program
     }
   });
 
-program.parse();
+if (process.argv.length <= 2) {
+  import('../src/interactive.js').then(({ startInteractiveMenu }) => {
+    startInteractiveMenu(buildPresentation, startServer);
+  }).catch(err => {
+    console.error(err);
+    process.exit(1);
+  });
+} else {
+  program.parse();
+}
 
 // ── Core Build Logic ──
 
