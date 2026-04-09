@@ -16,20 +16,50 @@ Tu única preocupación debe ser enseñar, explicar o exponer el contenido; `md-
 
 ---
 
+## 📦 Instalación
+
+### Requisitos previos
+
+- [Node.js](https://nodejs.org/) v18 o superior.
+
+### Paso 1: Clonar e instalar dependencias (local al proyecto)
+
+```bash
+git clone https://github.com/jdfesa/md-deck.git
+cd md-deck
+npm install
+```
+
+> Las dependencias (`commander`, `marked`, `gray-matter`) se instalan **dentro del proyecto** en la carpeta `node_modules/`. No se contamina el sistema global.
+
+### Paso 2 (Opcional): Registrar el comando global
+
+Si querés usar `md-deck` como comando desde cualquier carpeta de tu sistema:
+
+```bash
+npm link
+```
+
+Esto crea un symlink (acceso directo) global que apunta al binario del proyecto. **No duplica las dependencias**, solo las referencia.
+
+Si preferís no instalar nada de forma global, siempre podés ejecutar directamente:
+
+```bash
+node bin/md-deck.js build mi-presentacion.md
+```
+
+---
+
 ## 🚀 Quick Start
 
 ```bash
-# Instalar globalmente (una sola vez)
-npm link
-
-# Construir una presentación
+# Opción A: Si hiciste npm link (comando global)
 md-deck build mi-presentacion.md
-
-# Construir + servir localmente con preview
 md-deck serve mi-presentacion.md --open
 
-# Con fecha de expiración
-md-deck build mi-presentacion.md --expires 2026-04-22
+# Opción B: Sin instalar nada global (desde la raíz del proyecto)
+node bin/md-deck.js build mi-presentacion.md
+node bin/md-deck.js serve mi-presentacion.md --open
 ```
 
 ## 📚 Documentación Detallada
@@ -172,25 +202,63 @@ public class Main {
 
 ### `md-deck build <archivo.md>`
 
-Genera la presentación en `output/`.
+Lee el archivo Markdown, lo procesa y genera una carpeta dentro de `output/` con un **`index.html` autocontenido** listo para abrir directamente en cualquier navegador o subir a un hosting estático.
+
+**¿Qué se genera?**
+
+```
+output/
+└── a1b2c3d4-mi-presentacion/    ← carpeta con prefijo UUID único
+    ├── index.html                ← la presentación completa
+    └── img/                      ← copia de las imágenes (si existían)
+```
+
+> El prefijo UUID evita colisiones si generás varias versiones. Podés desactivarlo con `--no-uuid` o especificar tu propia carpeta con `-o`.
 
 | Flag | Descripción | Default |
 |---|---|---|
 | `-t, --theme <name>` | Tema CSS | `default` |
-| `-o, --output <dir>` | Directorio de salida | `output/<uuid>-<nombre>` |
-| `--title <string>` | Override del título | Frontmatter |
+| `-o, --output <dir>` | Directorio de salida personalizado | `output/<uuid>-<nombre>` |
+| `--title <string>` | Override del título | Valor del frontmatter |
 | `--expires <date>` | Fecha de expiración (YYYY-MM-DD) | — |
 | `--no-uuid` | Sin prefijo UUID en la carpeta | `false` |
 
+**Ejemplo:**
+
+```bash
+md-deck build examples/guia-rapida.md
+# ✅ Presentation built successfully!
+# 📂 /Users/jd/Development/md-deck/output/f3a1b9c2-guia-rapida
+# 📄 /Users/jd/.../output/f3a1b9c2-guia-rapida/index.html
+
+# Después simplemente abrí el archivo:
+open output/f3a1b9c2-guia-rapida/index.html
+```
+
 ### `md-deck serve <archivo.md>`
 
-Genera + sirve localmente.
+Genera la presentación y **levanta un servidor HTTP local** en tu máquina para previsualizarla en el navegador. Ideal mientras estás editando el `.md`.
+
+El servidor utiliza Node.js puro (`node:http`), sin dependencias externas adicionales. Se auto-asigna el puerto `8080` por defecto, y si ese puerto está ocupado, prueba el siguiente automáticamente.
 
 | Flag | Descripción | Default |
 |---|---|---|
 | `-p, --port <number>` | Puerto del servidor | `8080` |
-| `--open` | Abrir browser automáticamente | `false` |
+| `--open` | Abrir el navegador automáticamente | `false` |
 | `-t, --theme <name>` | Tema CSS | `default` |
+
+**Ejemplo:**
+
+```bash
+md-deck serve examples/guia-rapida.md --open
+#
+#  📽️  md-deck — Live Preview
+#  ─────────────────────────
+#  🌐 http://localhost:8080       ← abrí esta URL en tu navegador
+#  📂 output/guia-rapida
+#  ⌨️  Press Ctrl+C to stop       ← para detener el servidor
+#
+```
 
 ---
 
