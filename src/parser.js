@@ -21,6 +21,7 @@
  */
 
 import matter from 'gray-matter';
+import { sanitizeMarkdown } from './sanitizer.js';
 
 /**
  * @typedef {Object} SlideMeta
@@ -52,12 +53,16 @@ export function parse(raw) {
   // 1. Extract frontmatter
   const { data: meta, content } = matter(raw);
 
+  // 1.2 Sanitize markdown content
+  const cleanContent = sanitizeMarkdown(content);
+
   // 1.5 Auto-paginate if no separators are found
-  const processedContent = autoPaginate(content);
+  const processedContent = autoPaginate(cleanContent);
 
   // 2. Split content into raw slide blocks by `---`
   //    We need to be careful: `---` can appear in code blocks.
   const slideBlocks = splitSlides(processedContent);
+
 
   // 3. Classify each block as a slide type
   let sectionCounter = 0;
@@ -185,7 +190,9 @@ function classifySlide(block, index, sectionCount, isFirst) {
     // Short slide with only a heading and optionally a short description → section title
     const contentLines = lines.slice(1).filter(l => !l.startsWith('#'));
     const totalContentLength = contentLines.join(' ').length;
-    if (totalContentLength < 200) {
+    // Evitar romper diapositivas que son explícitamente listas
+    const hasListPattern = contentLines.some(l => /^\s*([-*+]|\d+\.)\s+/.test(l));
+    if (totalContentLength < 200 && !hasListPattern) {
       return { type: 'section', markdown: block, sectionNumber: 0 };
     }
   }

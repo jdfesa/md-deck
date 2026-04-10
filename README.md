@@ -82,6 +82,20 @@ Esto significa que podés tomar un `README.md`, un apunte de clase o un artícul
 
 ---
 
+## 🛡️ Sanitizador Automático (Linter)
+
+`md-deck` incluye un motor de pre-procesamiento silencioso que actúa como un **"Linter de Markdown"** antes de iniciar el renderizado. 
+Su objetivo es garantizar que la presentación no se rompa si el archivo de origen presenta inconsistencias comunes o descuidos de formato.
+
+**¿Qué problemas resuelve automáticamente?**
+- **Estandarización de viñetas:** Tolerar el uso errático de asteriscos (`*`) o signos de suma (`+`) como listas, transformándolos internamente al estándar unificado de guion medio (`-`) para evitar colisiones lógicas en el empaquetado del parser.
+- **Reparación de separadores:** Resuelve el pegado accidental de texto al separador `---`, inyectando los saltos de línea vitales alrededor del mismo.
+- **Títulos seguros:** Agrega los espacios faltantes si un usuario escribe accidentalmente un título pegado sin separar (ej: `##Título` -> `## Título`).
+
+> *Todo este filtrado ocurre estrictamente en memoria (RAM) y nunca reescribe ni contamina tu archivo local original.*
+
+---
+
 ## 📝 Formato del Markdown
 
 ### Frontmatter (YAML)

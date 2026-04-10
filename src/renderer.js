@@ -82,7 +82,7 @@ function renderTitleSlide(slide, meta) {
 
   // Remaining lines become the subtitle
   const restLines = lines.slice(1).filter(l => l.trim() !== '');
-  const subtitle = restLines.join(' ').trim();
+  const subtitle = restLines.join('\n').trim();
 
   // Build metadata grid from frontmatter
   const metaItems = [];
@@ -111,7 +111,7 @@ ${metaItems.map((item, i) => {
     : '';
 
   const subtitleHtml = subtitle
-    ? `<p class="subtitle">${escapeHtml(subtitle)}</p>`
+    ? `<div class="subtitle" style="margin-bottom: 48px; opacity: 0.8; font-size: 0.75em;">${marked.parse(subtitle)}</div>`
     : '';
 
   return `      <section class="title-slide" data-background-color="#0a0a0f">
